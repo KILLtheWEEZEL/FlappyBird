@@ -23,9 +23,9 @@ import javax.swing.Timer;
 @SuppressWarnings("serial")
 public class FlappyBird extends JFrame{
 	
-	private static FlappyBird board;
-	private ScoreHandler sh;
-	private Bird b;
+	private static FlappyBird gameBoard;
+	private ScoreHandler flappyScoreHandler;
+	private Bird playerCharacter;
 	
 	//Keep a list of pipes and high scores
 	private ArrayList<Pipe> pipes;
@@ -34,9 +34,7 @@ public class FlappyBird extends JFrame{
 	//Create a timer and set staring pace at .5 seconds per tick
 	private Timer timer;
 	private int timerSpeed = 17;
-	
-	//Counter used for bird physics
-	private int time;
+	private int gameTime;
 
 	//Create main menu buttons
 	private JButton newGameButton;
@@ -46,7 +44,7 @@ public class FlappyBird extends JFrame{
 	//Number of pipes bird has passed
 	private int score = 0;
 	
-	//Create 3 panels used in game and 1 to contain them all
+	//Create 3 panels used in game and a master panel to contain them all
 	private JPanel masterPanel = new JPanel();
 	private JPanel gameArea = new JPanel();
 	private JPanel mainMenu = new JPanel();
@@ -56,30 +54,29 @@ public class FlappyBird extends JFrame{
 	private CardLayout cards;
 	
 	//Physics Debugging
-	private boolean collision = true;//collision detection
-	private boolean endlessFall = true;//when bird falls off bottom of screen he appears at top and vice-versa
+	private boolean collisionDetection = true;//collision detection
+	private boolean endlessFalling = true;//when bird falls off bottom of screen he appears at top and vice-versa
 	
 	//Graphics/Console Debugging
-	private boolean showPipes = true;
-	private boolean showBird = true;
+	private boolean visiblePipes = true;
+	private boolean visibleBird = true;
 	private boolean showConsole = true;
-	
 	
 	//Toggles when GUI is first built so it isnt built multiple times
 	private boolean mainBuilt, gameBuilt, scoreBuilt;
 	
 	public static void main(String[] args) {
 		//Build board and make it visible
-		board = new FlappyBird();
-		board.setVisible(true);
-		board.setSize(1200,800);
-		board.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		gameBoard = new FlappyBird();
+		gameBoard.setVisible(true);
+		gameBoard.setSize(1200,800);
+		gameBoard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		//Center form on screen
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-	    int x = (int) ((dimension.getWidth() - board.getWidth()) / 2);
-	    int y = (int) ((dimension.getHeight() - board.getHeight()) / 2);
-	    board.setLocation(x, y);
+	    int x = (int) ((dimension.getWidth() - gameBoard.getWidth()) / 2);
+	    int y = (int) ((dimension.getHeight() - gameBoard.getHeight()) / 2);
+	    gameBoard.setLocation(x, y);
 	}
 	
 	//Create Main Menu and all objects that live there
@@ -121,7 +118,7 @@ public class FlappyBird extends JFrame{
 		}
 
 		//Create bird
-		b = new Bird();
+		playerCharacter = new Bird();
 		
     	//Add Key Binding for hopping bird
     	gameArea.getInputMap().put(KeyStroke.getKeyStroke("2"), "hop");
@@ -198,8 +195,8 @@ public class FlappyBird extends JFrame{
 	//Chooses opening panel 
 	public FlappyBird(){
 		//Estanblish connection to scoreHandler and get all scores from database
-		sh = new ScoreHandler();
-		scoreList = sh.getScores();
+		flappyScoreHandler = new ScoreHandler();
+		scoreList = flappyScoreHandler.getScores();
 		
 		//Create card layout to switch between panels 
 		cards = new CardLayout();
@@ -219,7 +216,7 @@ public class FlappyBird extends JFrame{
 	
 	//Creates and display graphics using a buffer strategy every tick
 	private void render(){
-		BufferStrategy bs = board.getBufferStrategy();
+		BufferStrategy bs = gameBoard.getBufferStrategy();
 		
 		//If buffer doesn't exist create a triple buffer
 		if(bs == null){
@@ -229,19 +226,20 @@ public class FlappyBird extends JFrame{
 		
 		Graphics g = bs.getDrawGraphics();
 
-		//Draw Background
+		//Draw gameBoard and paint it yellow
 		g.setColor(Color.YELLOW);
-		g.fillRect(0, 0, board.getWidth(), board.getHeight());
+		g.fillRect(0, 0, gameBoard.getWidth(), gameBoard.getHeight());
 
 		//If show pipes is on
-		if(showPipes){
-			//Build Main Pipe
+		if(visiblePipes){
+			
+			//Build a pipe that is as tall as the game board
 			g.setColor(Color.GREEN);
 			for(int i = 0; i < pipes.size(); i++){
-				g.fillRect(pipes.get(i).getX(), 0, pipes.get(i).getWidth(), board.getHeight());
+				g.fillRect(pipes.get(i).getX(), 0, pipes.get(i).getWidth(), gameBoard.getHeight());
 			}
 			
-			//Build Gap
+			//Build a gap for the bird to fly through
 			g.setColor(Color.BLUE);
 			for(int i = 0; i < pipes.size(); i++){
 				g.fillRect(pipes.get(i).getX(), pipes.get(i).getGapTop(), pipes.get(i).getWidth(), pipes.get(i).getGapHeight());
@@ -249,12 +247,12 @@ public class FlappyBird extends JFrame{
 		}
 		
 		//Draw Bird
-		if(showBird)
-			g.drawImage(b.getImage(), b.getX(), b.getY(), b.getWidth(), b.getHeigth(), null);
+		if(visibleBird)
+			g.drawImage(playerCharacter.getImage(), playerCharacter.getX(), playerCharacter.getY(), playerCharacter.getWidth(), playerCharacter.getHeigth(), null);
 
 		//Draw Score
 		g.setColor(Color.BLUE);
-		g.drawString(Integer.toString(score), board.getWidth()/2, 50);		
+		g.drawString(Integer.toString(score), gameBoard.getWidth()/2, 50);		
 		
 		//Dispose of old graphics and display buffer
 		g.dispose();
@@ -268,8 +266,8 @@ public class FlappyBird extends JFrame{
 		timer.stop();
 		
 		//Determine if score is in top 5 list must be sorted for this to work if so prompt for input regardless display score
-		String s = (String)JOptionPane.showInputDialog(
-                board,
+		String playerName = (String)JOptionPane.showInputDialog(
+                gameBoard,
                 "Your Score: "
                 + score + "\n Enter your name",
                 "John Doe");
@@ -277,13 +275,13 @@ public class FlappyBird extends JFrame{
 		//DONT ACCEPT NULL VALUE
 		
 		
-		System.out.println(score + ", " + s);
+		System.out.println(score + ", " + playerName);
 		
-		scoreList.add(new Score(score, s));
+		scoreList.add(new Score(score, playerName));
 		
 		sortScores();
 		
-		sh.writeFile();
+		flappyScoreHandler.writeFile();
 	}
 	
 	private void sortScores(){
@@ -294,34 +292,34 @@ public class FlappyBird extends JFrame{
 	private void birdLogic(Pipe p){
 	
 		//If collision Detection has been turned on
-		if(collision){
+		if(collisionDetection){
 			
 			//There is a pipe in collision range 
 			if(p != null){
 				//Check if bird hit pipe
-	    		if(b.getY() > (p.getGapTop() + p.getGapHeight()) || b.getY() < p.getGapTop())
+	    		if(playerCharacter.getY() > (p.getGapTop() + p.getGapHeight()) || playerCharacter.getY() < p.getGapTop())
 	    			dead();
 	    		
 	    		//Tick bird
 	    		else
-	    			b.tick(time, endlessFall);
+	    			playerCharacter.tick(gameTime, endlessFalling);
 			}
 			
 			//Bird is flying in open air
 			else{
-				if(!endlessFall){
+				if(!endlessFalling){
 		    		//Check if bird hit ground or ceiling
-		    		if(b.getY() > board.getHeight() + 25 || b.getY() <= 25)
+		    		if(playerCharacter.getY() > gameBoard.getHeight() + 25 || playerCharacter.getY() <= 25)
 		    			dead();
 		    		//Tick bird
 		    		else
-		    			b.tick(time, endlessFall);
+		    			playerCharacter.tick(gameTime, endlessFalling);
 				}
 				else
-					b.tick(time, endlessFall);
+					playerCharacter.tick(gameTime, endlessFalling);
 			}
 		}else
-			b.tick(time, endlessFall);
+			playerCharacter.tick(gameTime, endlessFalling);
 	}
 	
 	//Calculate if pipe is in a dangerous location or off screen the tick pipes
@@ -332,16 +330,16 @@ public class FlappyBird extends JFrame{
 		for(int i = 0; i < pipes.size(); i++){
 			pipes.get(i).tick();
 			
-			//If pipe has gone offscreen to the left send it back to the right
+			//If pipe has gone off screen to the left send it back to the right
 			if(pipes.get(i).getX() < -100){
 				pipes.get(i).sendToEnd();
 			}
 			//if bird is between left and right bounds of pipe flag pipe as a danger
-			else if(pipes.get(i).getX() <= b.getX() && (pipes.get(i).getX() + pipes.get(i).getWidth()) > b.getX()){
+			else if(pipes.get(i).getX() <= playerCharacter.getX() && (pipes.get(i).getX() + pipes.get(i).getWidth()) > playerCharacter.getX()){
 				p = new Pipe(pipes.get(i));
 			}
 			//if bird has just passed pipe increment score
-			else if((pipes.get(i).getX() + pipes.get(i).getWidth()) == b.getX())
+			else if((pipes.get(i).getX() + pipes.get(i).getWidth()) == playerCharacter.getX())
 				score++;
     	}
 		
@@ -390,20 +388,19 @@ public class FlappyBird extends JFrame{
 	    		birdLogic(dangerPipe);
 	    		
 	    		//Increment physics timer
-	    		time++;
+	    		gameTime++;
 	    		
 	    		//Print console data
 	    		if(showConsole)
 	    			console();
-	    		
 	    	}
 	    }
 
 		private void console() {
-			//Bird Position
-			System.out.println(b.toString());
+			//Print Bird Position
+			System.out.println(playerCharacter.toString());
 			
-			//Pipe Positions
+			//Print Pipe Positions
 			for(int i = 0; i < pipes.size(); i++){
 				System.out.println(pipes.get(i).toString());
 			}
@@ -417,8 +414,8 @@ public class FlappyBird extends JFrame{
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			time = 0;
-			b.hop(time);	
+			gameTime = 0;
+			playerCharacter.hop(gameTime);	
 		}
 	}
 	
@@ -428,7 +425,7 @@ public class FlappyBird extends JFrame{
 		public void actionPerformed(ActionEvent e)
 		{
 			System.out.println("reset game");
-			time = 0;
+			gameTime = 0;
 			buildGameBoard();
 		}
 	}
@@ -439,7 +436,7 @@ public class FlappyBird extends JFrame{
 		public void actionPerformed(ActionEvent e)
 		{
 			System.out.println("Main Menu");
-			time = 0;
+			gameTime = 0;
 			timer.restart();
 			timer.stop();
 			gameBuilt = false;
