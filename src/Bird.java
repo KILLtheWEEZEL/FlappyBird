@@ -13,13 +13,18 @@ public class Bird {
 	private String filename = new String("Daniel_Sprite.png");
     
 	public Bird() {
+		//Default position
 		x = 100;
 		y = 400;
+		
+		//Default size
 		height = 25;
 		width = 25;
 		
+		//Default velocity
 		initialVelocity = 0;
 	
+		//Find icon for bird
 		try {                
 			birdImage = ImageIO.read(new File(filename));
 			System.out.println("FOUND file");
@@ -51,6 +56,7 @@ public class Bird {
 		//t is 1/30 of a second (30fps)
 		t /=30;
 		
+		//If bird falls below screen appear at top
 		if(fall){
 			if(y > 800){
 				y = 0;

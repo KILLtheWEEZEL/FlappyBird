@@ -62,7 +62,7 @@ public class FlappyBird extends JFrame{
 	private boolean visibleBird = true;
 	private boolean showConsole = true;
 	
-	//Toggles when GUI is first built so it isnt built multiple times
+	//Toggles when GUI is first built so it isn't built multiple times
 	private boolean mainBuilt, gameBuilt, scoreBuilt;
 	
 	public static void main(String[] args) {
@@ -194,7 +194,7 @@ public class FlappyBird extends JFrame{
 	
 	//Chooses opening panel 
 	public FlappyBird(){
-		//Estanblish connection to scoreHandler and get all scores from database
+		//Establish connection to scoreHandler and get all scores from database
 		flappyScoreHandler = new ScoreHandler();
 		scoreList = flappyScoreHandler.getScores();
 		
@@ -352,7 +352,7 @@ public class FlappyBird extends JFrame{
 	{
 		public void actionPerformed(ActionEvent e)
 	    {
-	    	//If game hasnt been built build it then show game
+	    	//If game hasn't been built build it then show game
 	    	if(e.getSource() == newGameButton){
 		    	System.out.println("newgamebutton");
 		    	if(!gameBuilt)
@@ -361,7 +361,7 @@ public class FlappyBird extends JFrame{
 		    	gameArea.requestFocus();
 	    	}
 	    	
-	    	//If score menu hasnt been built build it then show score menu
+	    	//If score menu hasn't been built build it then show score menu
 	    	else if(e.getSource() == scoreButton){
 		    	System.out.println("scorebutton");
 
@@ -370,7 +370,7 @@ public class FlappyBird extends JFrame{
 		    	cards.show(masterPanel, "score");
 	    	}
 	    	
-	    	//If menu hasnt been built build it then show menu
+	    	//If menu hasn't been built build it then show menu
 	    	else if(e.getSource() == mainMenuButton){
 		    	System.out.println("mainMenubutton");
 		    	if(!mainBuilt)

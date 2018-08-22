@@ -2,14 +2,17 @@
 8,Danielle
 5,Rob
 3,Colleen
+3,John Doe
+2,No but this one
+2,Kenny
+1,ken bobb
+1,John Doe
+1,This Score
 0,John Doe
 0,John Doe
 0,New Kenny
 0,who
 0,ken bobb
-1,ken bobb
-1,John Doe
 0,John Doe
-1,This Score
-2,No but this one
+0,John Doe
 0,John Doe

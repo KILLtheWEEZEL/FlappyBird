@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 
@@ -13,7 +14,7 @@ public class ScoreHandler {
 
 	public ScoreHandler() {
 		readFile();
-		//sort Data before writing data
+		sortScores();
 		writeFile();
 	}
 	
@@ -70,12 +71,28 @@ public class ScoreHandler {
 	}
 	
 	private void printScores(){
-		for(int i = 0; i < scores.size(); i++){
-			System.out.println(scores.get(i).getScore() + scores.get(i).getName());
+		System.out.println("Sort scores");
+		
+		//Loop through all scores and print using toString
+		for(Score str: scores){
+			System.out.println(str);
 		}
+		
+		System.out.println();
+		
 	}
 	
 	public ArrayList<Score> getScores(){
 		return scores;
+	}
+	
+	private void sortScores()
+	{
+		//Sort scores using custom compareTo
+		Collections.sort(scores);
+		
+		//Print scores to console for debugging
+		printScores();
+	
 	}
 }
