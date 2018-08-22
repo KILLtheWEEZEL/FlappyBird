@@ -1,11 +1,5 @@
-/Bird.class
-/FlappyBird$HopAction.class
-/FlappyBird$Listen.class
-/FlappyBird$MenuAction.class
-/FlappyBird$ResetAction.class
-/FlappyBird.class
-/GameBoard$Listen.class
-/GameBoard.class
-/Pipe.class
-/Score.class
-/ScoreHandler.class
+/FloatyBird$HopAction.class
+/FloatyBird$Listen.class
+/FloatyBird$MenuAction.class
+/FloatyBird$ResetAction.class
+/FloatyBird.class

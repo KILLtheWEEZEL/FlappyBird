@@ -21,10 +21,10 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
 @SuppressWarnings("serial")
-public class FlappyBird extends JFrame{
+public class FloatyBird extends JFrame{
 	
-	private static FlappyBird gameBoard;
-	private ScoreHandler flappyScoreHandler;
+	private static FloatyBird gameBoard;
+	private ScoreHandler floatyScoreHandler;
 	private Bird playerCharacter;
 	
 	//Keep a list of pipes and high scores
@@ -67,7 +67,7 @@ public class FlappyBird extends JFrame{
 	
 	public static void main(String[] args) {
 		//Build board and make it visible
-		gameBoard = new FlappyBird();
+		gameBoard = new FloatyBird();
 		gameBoard.setVisible(true);
 		gameBoard.setSize(1200,800);
 		gameBoard.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -86,7 +86,7 @@ public class FlappyBird extends JFrame{
 		mainMenu.setLayout(new GridLayout(3, 1));
 		
 		//Create and add title to top
-		JLabel title = new JLabel("Flappy Bird");
+		JLabel title = new JLabel("Floaty Bird");
 		title.setHorizontalAlignment(SwingConstants.CENTER);
 		
 		//Create new game button in center and add actionListener
@@ -193,10 +193,10 @@ public class FlappyBird extends JFrame{
 	}
 	
 	//Chooses opening panel 
-	public FlappyBird(){
+	public FloatyBird(){
 		//Establish connection to scoreHandler and get all scores from database
-		flappyScoreHandler = new ScoreHandler();
-		scoreList = flappyScoreHandler.getScores();
+		floatyScoreHandler = new ScoreHandler();
+		scoreList = floatyScoreHandler.getScores();
 		
 		//Create card layout to switch between panels 
 		cards = new CardLayout();
@@ -280,7 +280,7 @@ public class FlappyBird extends JFrame{
 			
 			sortScores();
 			
-			flappyScoreHandler.writeFile();
+			floatyScoreHandler.writeFile();
 		}catch (Exception e) {
 			System.out.println(e.getMessage());
 		}

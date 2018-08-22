@@ -1,13 +1,13 @@
-FlappyBird:
+FloatyBird:
 
-  This project is my attempt at recreating FlappyBird in Java  
+  This project is my attempt at reimagining popular app FlappyBird in Java
 
 Controls
 Press '2' to hop
 Press '3' to restart level 
 Press '4' to return to main menu
 
-FlappyBird.java -  
+FloatyBird.java -  
 Main program logic controlling gameboard and interfacing with all other objects and controllers
 
 ScoreHandler.java - 
