@@ -27,7 +27,7 @@ public class ScoreHandler {
 			
 			//Until EOF
 			while(read.hasNextLine()){
-				//Temp values for input
+				//Temporary values for input
 				String[] lineValue = new String[2];
 				int score;
 				String name;

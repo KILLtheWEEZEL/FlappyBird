@@ -27,5 +27,3 @@ Must be in the format of '[Score],[Name]'
 Known Bugs:
 1)Physics engine does not allow bird to hop high enough fast enough to reach some gaps
 -Physics engine could be modified or pipe gaps could be spawned within a certain range of one another to ensure reachability
-
-2)Application crashes if 'cancel' is selected while entering score  

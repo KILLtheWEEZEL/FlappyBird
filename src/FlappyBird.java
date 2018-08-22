@@ -273,15 +273,17 @@ public class FlappyBird extends JFrame{
                 "John Doe");
 		
 		//DONT ACCEPT NULL VALUE
-		
-		
-		System.out.println(score + ", " + playerName);
-		
-		scoreList.add(new Score(score, playerName));
-		
-		sortScores();
-		
-		flappyScoreHandler.writeFile();
+		try {
+			System.out.println(score + ", " + playerName);
+			
+			scoreList.add(new Score(score, playerName));
+			
+			sortScores();
+			
+			flappyScoreHandler.writeFile();
+		}catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	private void sortScores(){
