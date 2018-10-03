@@ -14,11 +14,15 @@ ScoreHandler.java -
 Reads, Writes, and Sorts score data to scores.txt file
 Creates arraylist of score objects 
 
-Score.java - 
-Score object consisting of a (str)name and (int)score
+Pipe.java - 
+Pipe object consisting of pipe and gap location. 
+Pipes move toward bird. Gaps are generated randomly.
 
 Bird.java - 
 Bird object consisting of X/Y positioning, height, width, and a simple physics engine
+
+Score.java - 
+Score object consisting of a (str)name and (int)score
 
 Scores.txt - 
 File consisting of all recorded scores

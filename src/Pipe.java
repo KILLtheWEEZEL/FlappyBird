@@ -11,9 +11,9 @@ public class Pipe {
 		gapTop = generateGap();
 	}
 	
-	public Pipe(int x, int y){
+	public Pipe(int x, int prevousGapY){
 		this.x = x;
-		gapTop = y;
+		gapTop = generateGap(prevousGapY);
 	}
 	
 	public Pipe(Pipe p){
@@ -42,6 +42,15 @@ public class Pipe {
 		return r.nextInt(700);
 	}
 	
+	private int generateGap(int previousGapY){
+		//Randomly generate a gap no more than 500 above previous gap
+		int upperBound = previousGapY + 500;
+		if (upperBound > 700)
+			upperBound = 700;
+		Random r = new Random();
+		return r.nextInt(upperBound);
+	}
+	
 	public String toString(){
 		return "Pipe X: " + getX() + " Start Gap Y: " + getGapTop();
 	}
@@ -50,8 +59,8 @@ public class Pipe {
 		x-=2;
 	}
 	
-	public void sendToEnd(){
+	public void sendToEnd(int previousGapY){
 		x = 1400;
-		generateGap();
+		generateGap(previousGapY);
 	}
 }

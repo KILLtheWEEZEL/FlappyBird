@@ -15,15 +15,15 @@ public class ScoreHandler {
 	public ScoreHandler() {
 		readFile();
 		sortScores();
-		writeFile();
 	}
 	
 	private void readFile(){
 		System.out.println("Reading file " + fileName);
+		scores = new ArrayList<Score>();
+		
 		try{
 			//Find file
 			Scanner read = new Scanner (new File(fileName));
-			scores = new ArrayList<Score>();
 			
 			//Until EOF
 			while(read.hasNextLine()){
@@ -53,6 +53,8 @@ public class ScoreHandler {
 	
 	public void writeFile(){
 		System.out.println("writing file");
+		
+		sortScores();
 		
 		//Iterate through arraylist, format and print data to file
 		try {
@@ -84,6 +86,11 @@ public class ScoreHandler {
 	
 	public ArrayList<Score> getScores(){
 		return scores;
+	}
+	
+	public int getHighScore() {
+		sortScores();
+		return scores.get(0).getScore();
 	}
 	
 	private void sortScores()

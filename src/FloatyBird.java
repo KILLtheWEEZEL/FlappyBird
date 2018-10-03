@@ -2,15 +2,23 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferStrategy;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,6 +27,9 @@ import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EmptyBorder;
 
 @SuppressWarnings("serial")
 public class FloatyBird extends JFrame{
@@ -43,12 +54,16 @@ public class FloatyBird extends JFrame{
 	
 	//Number of pipes bird has passed
 	private int score = 0;
+	private int highScore = 0;
 	
 	//Create 3 panels used in game and a master panel to contain them all
 	private JPanel masterPanel = new JPanel();
 	private JPanel gameArea = new JPanel();
-	private JPanel mainMenu = new JPanel();
+	private JPanel mainMenuScreen = new JPanel();
 	private JPanel scoreMenu = new JPanel();
+	
+	private Font menuFont = new Font("Impact", Font.PLAIN, 72);
+	private CompoundBorder menuBorder = new CompoundBorder(BorderFactory.createMatteBorder(0, 0, 100, 0, Color.GREEN), new EmptyBorder(0, 100, 0, 100)); //add green bottom border for grass and padding
 	
 	//Create cardLayout so I may switch between 3 main Panels
 	private CardLayout cards;
@@ -83,24 +98,66 @@ public class FloatyBird extends JFrame{
 	private void buildMainMenu(){
 		System.out.println("BUILD Main Menu");
 		
-		mainMenu.setLayout(new GridLayout(3, 1));
+		//Create container layout
+		mainMenuScreen.setLayout(new GridLayout(2, 1));
+		mainMenuScreen.setBackground(Color.CYAN);
+		mainMenuScreen.setBorder(menuBorder); //add green bottom border for grass and padding
 		
 		//Create and add title to top
 		JLabel title = new JLabel("Floaty Bird");
+		title.setFont(menuFont);
 		title.setHorizontalAlignment(SwingConstants.CENTER);
+		mainMenuScreen.add(title);
+		
+		//Create central content pane
+		JPanel mainMenuContent = new JPanel();
+		mainMenuContent.setLayout(new GridLayout(1, 2));
+		mainMenuContent.setBackground(Color.CYAN);
+		
+		//Create Image of player on left side
+		BufferedImage myPicture = null;
+		try {
+			myPicture = ImageIO.read(new File("bird.png"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		JLabel picLabel = new JLabel();
+		picLabel.setIcon(new ImageIcon(new ImageIcon(myPicture).getImage().getScaledInstance(400, 280, Image.SCALE_DEFAULT)));
+
+	
+		//Create button pane
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridLayout(2,1));
 		
 		//Create new game button in center and add actionListener
-		newGameButton = new JButton("New Game");
+		newGameButton = new JButton("Play");
 		newGameButton.addActionListener(new Listen());
+		newGameButton.setBackground(Color.CYAN);
+		newGameButton.setOpaque(true);
+		newGameButton.setBorderPainted(false);
+		newGameButton.setFont(menuFont);
+		newGameButton.setForeground(new Color(255, 170, 0));
 		
 		//Create high score button at bottom and add actionListener
-		scoreButton = new JButton("High Scores");
+		scoreButton = new JButton("Scores");
 		scoreButton.addActionListener(new Listen());
+		scoreButton.setBackground(Color.CYAN);
+		scoreButton.setOpaque(true);
+		scoreButton.setBorderPainted(false);
+		scoreButton.setFont(menuFont);
+		scoreButton.setForeground(new Color(255, 170, 0));
 		
-		//Add object in this order to panel
-		mainMenu.add(title);
-		mainMenu.add(newGameButton);
-		mainMenu.add(scoreButton);
+		//Add object in this order to button panel
+		buttonPanel.add(newGameButton);
+		buttonPanel.add(scoreButton);
+		
+		//Add objects to mainMenuContent Panel
+		mainMenuContent.add(picLabel);
+		mainMenuContent.add(buttonPanel);
+		
+		//Add menu content to screen
+		mainMenuScreen.add(mainMenuContent);
 		
 		//Indicated menu has been built
 		mainBuilt = true;
@@ -113,23 +170,29 @@ public class FloatyBird extends JFrame{
 		pipes = new ArrayList<Pipe>();
 		
 		//Create 5 pipes every 300 pixels starting at 600
-		for(int i = 0; i < 5; i++){
-			pipes.add(new Pipe(600 + (300*i) ));
+		for(int i = 0; i < 3; i++){			
+			//Create a new pipe with a random gap
+			if (i == 0)
+				pipes.add(new Pipe(600 + (500*i) ));
+			//Create other pipes within a threshold of first gap
+			else
+				pipes.add(new Pipe(600 +(500*i),pipes.get(i-1).getGapTop()));
+			
 		}
 
 		//Create bird
 		playerCharacter = new Bird();
 		
     	//Add Key Binding for hopping bird
-    	gameArea.getInputMap().put(KeyStroke.getKeyStroke("2"), "hop");
+    	gameArea.getInputMap().put(KeyStroke.getKeyStroke("SPACE"), "hop");
     	gameArea.getActionMap().put("hop", new HopAction());
     	
     	//Add Key Binding for resetting game
-    	gameArea.getInputMap().put(KeyStroke.getKeyStroke("3"), "reset");
+    	gameArea.getInputMap().put(KeyStroke.getKeyStroke("R"), "reset");
     	gameArea.getActionMap().put("reset", new ResetAction());
     	
     	//Add Key Binding for returning to main menu
-    	gameArea.getInputMap().put(KeyStroke.getKeyStroke("4"), "main");
+    	gameArea.getInputMap().put(KeyStroke.getKeyStroke("ESCAPE"), "main");
     	gameArea.getActionMap().put("main", new MenuAction());
     	
     	//Allows panel to listen for keystrokes
@@ -140,6 +203,7 @@ public class FloatyBird extends JFrame{
     	timer.start();
     	
     	score = 0;
+    	highScore = floatyScoreHandler.getHighScore();
     	
     	gameBuilt = true;
 	}
@@ -147,29 +211,44 @@ public class FloatyBird extends JFrame{
 	//Create High Score Menu(IN PROGRESS...)
 	private void buildScoreMenu(){
 		System.out.println("BUILD Score Menu");
-
+	
+		//Create container layout for top and bottom halves of screen
+		scoreMenu.setLayout(new GridLayout(2, 1));
+		scoreMenu.setBackground(Color.CYAN);
+		scoreMenu.setBorder(menuBorder);
 		
-		scoreMenu.setLayout(new BorderLayout());
+		JPanel titlePanel = new JPanel();
+		titlePanel.setLayout(new GridLayout(1,2));
+		titlePanel.setBackground(Color.CYAN);
 		
 		//Create and add title to top
-		JLabel title = new JLabel("Top 3 High Scores");
+		JLabel title = new JLabel("High Scores");
 		title.setHorizontalAlignment(SwingConstants.CENTER);
-		scoreMenu.add(title, BorderLayout.NORTH);
+		title.setFont(menuFont);
+		titlePanel.add(title);
 		
 		//Create main menu button at bottom and add actionListener
-		mainMenuButton = new JButton("Return to Main Menu");
+		mainMenuButton = new JButton("Back to Menu");
 		mainMenuButton.addActionListener(new Listen());
-		scoreMenu.add(mainMenuButton, BorderLayout.SOUTH);
+		titlePanel.add(mainMenuButton);
+		mainMenuButton.setBackground(Color.CYAN);
+		mainMenuButton.setOpaque(true);
+		mainMenuButton.setBorderPainted(false);
+		mainMenuButton.setFont(menuFont);
+		mainMenuButton.setForeground(new Color(255, 170, 0));
+		
+		scoreMenu.add(titlePanel);
 		
 		//Create a Panel for Position, Name, and Score
-		JPanel scorePanel = new JPanel(new GridLayout(10 , 2));
+		JPanel scorePanel = new JPanel(new GridLayout(5 , 2));
+		scorePanel.setBackground(Color.CYAN);
 		JLabel name, score;
 		
-		//List top ten people 
-		for(int i = 0; i < 10; i++){
+		//List top five scores 
+		for(int i = 0; i < 5; i++){
 			
 			if(i >= scoreList.size()){
-				name = new JLabel("AAAAA");
+				name = new JLabel("Player " + (i+1));
 				score = new JLabel("0");
 			}
 			else{
@@ -177,17 +256,20 @@ public class FloatyBird extends JFrame{
 				score = new JLabel(String.valueOf(scoreList.get(i).getScore()));
 			}
 		
-			//Center Labels
-			name.setHorizontalAlignment(SwingConstants.CENTER);
-			score.setHorizontalAlignment(SwingConstants.CENTER);
+			score.setHorizontalAlignment(SwingConstants.RIGHT);
+			
+			name.setFont(menuFont);
+			score.setFont(menuFont);
 			
 			//Add labels to scorePanel
 			scorePanel.add(name);
 			scorePanel.add(score);
+			
+			scorePanel.setBorder(new EmptyBorder(0,200, 0, 200));
 		}
 		
 		//Add score Panel to scoreMenu
-		scoreMenu.add(scorePanel, BorderLayout.CENTER);
+		scoreMenu.add(scorePanel);
 		
 		scoreBuilt = true;
 	}
@@ -203,7 +285,7 @@ public class FloatyBird extends JFrame{
 		
 		//Add Panels to master panel
         masterPanel.setLayout(cards);
-        masterPanel.add(mainMenu, "main");
+        masterPanel.add(mainMenuScreen, "main");
         masterPanel.add(gameArea, "game");
         masterPanel.add(scoreMenu, "score");
         masterPanel.setVisible(true);
@@ -220,27 +302,29 @@ public class FloatyBird extends JFrame{
 		
 		//If buffer doesn't exist create a triple buffer
 		if(bs == null){
-			createBufferStrategy(3);
+			gameBoard.createBufferStrategy(3);
 			return;
 		}
 		
 		Graphics g = bs.getDrawGraphics();
 
 		//Draw gameBoard and paint it yellow
-		g.setColor(Color.YELLOW);
+		g.setColor(Color.CYAN);
 		g.fillRect(0, 0, gameBoard.getWidth(), gameBoard.getHeight());
 
-		//If show pipes is on
-		if(visiblePipes){
-			
-			//Build a pipe that is as tall as the game board
-			g.setColor(Color.GREEN);
+		if(visiblePipes){	
 			for(int i = 0; i < pipes.size(); i++){
+				//Draw Pipe as tall as gameBoard
+				g.setColor(Color.GREEN);
 				g.fillRect(pipes.get(i).getX(), 0, pipes.get(i).getWidth(), gameBoard.getHeight());
+
+				//Draw Border
+				g.setColor(Color.BLACK);
+				g.drawRect(pipes.get(i).getX(), 0, pipes.get(i).getWidth()-1, gameBoard.getHeight()-1);
 			}
 			
 			//Build a gap for the bird to fly through
-			g.setColor(Color.BLUE);
+			g.setColor(Color.CYAN);
 			for(int i = 0; i < pipes.size(); i++){
 				g.fillRect(pipes.get(i).getX(), pipes.get(i).getGapTop(), pipes.get(i).getWidth(), pipes.get(i).getGapHeight());
 			}
@@ -250,11 +334,15 @@ public class FloatyBird extends JFrame{
 		if(visibleBird)
 			g.drawImage(playerCharacter.getImage(), playerCharacter.getX(), playerCharacter.getY(), playerCharacter.getWidth(), playerCharacter.getHeigth(), null);
 
-		//Draw Score
-		g.setColor(Color.BLUE);
-		g.drawString(Integer.toString(score), gameBoard.getWidth()/2, 50);		
+		//Draw Scores
+		g.setColor(Color.BLACK);
+		g.setFont(new Font("Sans", Font.PLAIN, 20));
+		g.drawString("High Score: " + Integer.toString(highScore), gameBoard.getWidth() - 200, gameBoard.getHeight() - 50);
+		g.drawString("Score: " + Integer.toString(score), gameBoard.getWidth() - 200, gameBoard.getHeight() - 30);
 		
-		//Dispose of old graphics and display buffer
+		
+		
+		//Dispose of old graphics and show display buffer
 		g.dispose();
 		bs.show();
 	}
@@ -265,29 +353,27 @@ public class FloatyBird extends JFrame{
 		
 		timer.stop();
 		
-		//Determine if score is in top 5 list must be sorted for this to work if so prompt for input regardless display score
-		String playerName = (String)JOptionPane.showInputDialog(
-                gameBoard,
-                "Your Score: "
-                + score + "\n Enter your name",
-                "John Doe");
+		int rank = 1;
+		
+		//Find player rank
+		for(Score s: scoreList) {
+			if (score > s.getScore()) {
+				break;
+			}
+			rank++;
+		}
+		
+		String playerName = (String)JOptionPane.showInputDialog(gameBoard,
+                "You are rank " + rank + " with a score of " + score, "Enter name here");
 		
 		//DONT ACCEPT NULL VALUE
 		try {
-			System.out.println(score + ", " + playerName);
-			
+			System.out.println("Score saved: " + score + ", " + playerName);
 			scoreList.add(new Score(score, playerName));
-			
-			sortScores();
-			
 			floatyScoreHandler.writeFile();
-		}catch (Exception e) {
-			System.out.println(e.getMessage());
+		}catch (Exception NullPointerException) {
+			System.out.println("Score not saved");
 		}
-	}
-	
-	private void sortScores(){
-		//SORT THE SCORES DUH
 	}
 	
 	//Calculate if bird has collided with obstacle if not tick bird
@@ -302,25 +388,30 @@ public class FloatyBird extends JFrame{
 	    		if(playerCharacter.getY() > (p.getGapTop() + p.getGapHeight()) || playerCharacter.getY() < p.getGapTop())
 	    			dead();
 	    		
-	    		//Tick bird
+	    		//Else tick bird
 	    		else
 	    			playerCharacter.tick(gameTime, endlessFalling);
 			}
 			
 			//Bird is flying in open air
 			else{
+				//Code block unused unless endless falling is toggled off
 				if(!endlessFalling){
 		    		//Check if bird hit ground or ceiling
 		    		if(playerCharacter.getY() > gameBoard.getHeight() + 25 || playerCharacter.getY() <= 25)
 		    			dead();
-		    		//Tick bird
+		    		
+		    		//Else tick bird
 		    		else
 		    			playerCharacter.tick(gameTime, endlessFalling);
 				}
+				//Else tick bird
 				else
 					playerCharacter.tick(gameTime, endlessFalling);
 			}
-		}else
+		}
+		//Else tick bird
+		else
 			playerCharacter.tick(gameTime, endlessFalling);
 	}
 	
@@ -330,11 +421,16 @@ public class FloatyBird extends JFrame{
 		
 		//Tick pipes
 		for(int i = 0; i < pipes.size(); i++){
+			//Index of previous pipe if first index wrap to end
+			int previousPipe = i-1;
+			if (previousPipe == -1) {
+				previousPipe = pipes.size()-1;
+			}
 			pipes.get(i).tick();
 			
 			//If pipe has gone off screen to the left send it back to the right
 			if(pipes.get(i).getX() < -100){
-				pipes.get(i).sendToEnd();
+				pipes.get(i).sendToEnd(pipes.get(previousPipe).getGapTop());
 			}
 			//if bird is between left and right bounds of pipe flag pipe as a danger
 			else if(pipes.get(i).getX() <= playerCharacter.getX() && (pipes.get(i).getX() + pipes.get(i).getWidth()) > playerCharacter.getX()){
@@ -416,7 +512,8 @@ public class FloatyBird extends JFrame{
 	{
 		public void actionPerformed(ActionEvent e)
 		{
-			gameTime = 0;
+			System.out.println(e.toString());
+			gameTime = 1;
 			playerCharacter.hop(gameTime);	
 		}
 	}

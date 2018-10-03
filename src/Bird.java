@@ -10,7 +10,7 @@ public class Bird {
 	private double initialVelocity;
 	private final double GRAVITY = 9.8;
 	private BufferedImage birdImage;
-	private String filename = new String("Daniel_Sprite.png");
+	private String filename = new String("bird.png");
     
 	public Bird() {
 		//Default position
@@ -76,7 +76,7 @@ public class Bird {
 		initialVelocity = 6;
 		
 		//Position function relative to time
-		y += -((int)(initialVelocity * t) - (.5*GRAVITY*t*t));
+		y += 6;//-((int)(initialVelocity * t) - (.5*GRAVITY*t*t));
 	}
 	
 	public String toString(){
